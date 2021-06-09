@@ -1,0 +1,24 @@
+package com.aeneas.state.diffs
+
+import com.aeneas.features.BlockchainFeatures
+import com.aeneas.lang.ValidationError
+import com.aeneas.state.{Blockchain, Diff, LeaseBalance, Portfolio}
+import com.aeneas.transaction.CreateAliasTransaction
+import com.aeneas.transaction.TxValidationError.GenericError
+
+import scala.util.Right
+
+object CreateAliasTransactionDiff {
+  def apply(blockchain: Blockchain)(tx: CreateAliasTransaction): Either[ValidationError, Diff] =
+    if (blockchain.isFeatureActivated(BlockchainFeatures.DataTransaction, blockchain.height) && !blockchain.canCreateAlias(tx.alias))
+      Left(GenericError("Alias already claimed"))
+    else
+      Right(
+        Diff(
+          tx = tx,
+          portfolios = Map(tx.sender.toAddress -> Portfolio(-tx.fee, LeaseBalance.empty, Map.empty)),
+          aliases = Map(tx.alias               -> tx.sender.toAddress),
+          scriptsRun = DiffsCommon.countScriptRuns(blockchain, tx)
+        )
+      )
+}

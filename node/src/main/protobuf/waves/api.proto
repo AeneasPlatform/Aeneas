@@ -1,0 +1,12 @@
+syntax = "proto3";
+package waves.api;
+option java_package = "com.aeneas.protobuf.api";
+
+message DataRequest {
+    repeated string keys = 1;
+    string matches = 2;
+}
+
+message TransactionsByIdRequest {
+    repeated string ids = 1;
+}

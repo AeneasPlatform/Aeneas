@@ -1,0 +1,22 @@
+package com.aeneas.lang.v1.estimator
+
+import com.aeneas.lang.v1.FunctionHeader
+import com.aeneas.lang.v1.compiler.Terms.EXPR
+import com.aeneas.lang.v1.estimator.v2.ScriptEstimatorV2
+import com.aeneas.lang.v1.estimator.v3.ScriptEstimatorV3
+import monix.eval.Coeval
+
+trait ScriptEstimator {
+  val version: Int
+
+  def apply(
+    declaredVals:  Set[String],
+    functionCosts: Map[FunctionHeader, Coeval[Long]],
+    expr:          EXPR
+  ): Either[String, Long]
+}
+
+object ScriptEstimator {
+  val all: List[ScriptEstimator] =
+    List(ScriptEstimatorV1, ScriptEstimatorV2, ScriptEstimatorV3)
+}
