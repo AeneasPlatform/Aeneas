@@ -1,0 +1,102 @@
+package com.aeneas.transaction.smart.script
+
+import cats.Id
+import cats.implicits._
+import com.aeneas.account.AddressScheme
+import com.aeneas.common.state.ByteStr
+import com.aeneas.lang._
+import com.aeneas.lang.contract.DApp
+import com.aeneas.lang.directives.DirectiveSet
+import com.aeneas.lang.directives.values.{Account, Asset, Expression}
+import com.aeneas.lang.script.v1.ExprScript
+import com.aeneas.lang.script.{ContractScript, Script}
+import com.aeneas.lang.v1.compiler.Terms.{EVALUATED, TRUE}
+import com.aeneas.lang.v1.evaluator._
+import com.aeneas.lang.v1.evaluator.ctx.EvaluationContext
+import com.aeneas.lang.v1.evaluator.ctx.impl.waves.Bindings
+import com.aeneas.lang.v1.traits.Environment
+import com.aeneas.state._
+import com.aeneas.transaction.smart.{DApp => DAppTarget, _}
+import com.aeneas.transaction.{Authorized, Proven}
+import monix.eval.Coeval
+
+object ScriptRunner {
+  type TxOrd = BlockchainContext.In
+
+  def apply(
+      in: TxOrd,
+      blockchain: Blockchain,
+      script: Script,
+      isAssetScript: Boolean,
+      scriptContainerAddress: Environment.Tthis
+  ): (Log[Id], Either[ExecutionError, EVALUATED]) = {
+
+    def evalVerifier(
+        isContract: Boolean,
+        partialEvaluate: (DirectiveSet, EvaluationContext[Environment, Id]) => Either[(ExecutionError, Log[Id]), (EVALUATED, Log[Id])]
+    ) = {
+      val txId = in.eliminate(_.id(), _ => ByteStr.empty)
+      val eval = for {
+        ds <- DirectiveSet(script.stdLibVersion, if (isAssetScript) Asset else Account, Expression).leftMap((_, Nil))
+        mi <- buildThisValue(in, blockchain, ds, scriptContainerAddress).leftMap((_, Nil))
+        ctx <- BlockchainContext
+          .build(
+            script.stdLibVersion,
+            AddressScheme.current.chainId,
+            Coeval.evalOnce(mi),
+            Coeval.evalOnce(blockchain.height),
+            blockchain,
+            isAssetScript,
+            isContract,
+            scriptContainerAddress,
+            txId
+          )
+          .leftMap((_, Nil))
+        result <- partialEvaluate(ds, ctx)
+      } yield result
+
+      eval.fold(
+        { case (error, log)  => (log, error.asLeft[EVALUATED]) },
+        { case (result, log) => (log, result.asRight[ExecutionError]) }
+      )
+    }
+
+    val evaluate = EvaluatorV2.applyCompleted(_, _, script.stdLibVersion)
+
+    script match {
+      case s: ExprScript =>
+        evalVerifier(isContract = false, (_, ctx) => evaluate(ctx, s.expr))
+
+      case ContractScript.ContractScriptImpl(_, DApp(_, decls, _, Some(vf))) =>
+        val partialEvaluate: (DirectiveSet, EvaluationContext[Environment, Id]) => Either[(ExecutionError, Log[Id]), (EVALUATED, Log[Id])] = {
+          (directives, ctx) =>
+            val verify = ContractEvaluator.verify(decls, vf, ctx, evaluate, _)
+            in.eliminate(
+              t =>
+                RealTransactionWrapper(t, blockchain, directives.stdLibVersion, DAppTarget)
+                  .leftMap((_, Nil))
+                  .flatMap(tx => verify(Bindings.transactionObject(tx, proofsEnabled = true))),
+              _.eliminate(
+                t => verify(Bindings.orderObject(RealTransactionWrapper.ord(t), proofsEnabled = true)),
+                _ => ???
+              )
+            )
+        }
+        evalVerifier(isContract = true, partialEvaluate)
+
+      case ContractScript.ContractScriptImpl(_, DApp(_, _, _, None)) =>
+        val proven: Proven with Authorized =
+          in.eliminate(
+            _.asInstanceOf[Proven with Authorized],
+            _.eliminate(
+              _.asInstanceOf[Proven with Authorized],
+              _ => ???
+            )
+          )
+        (Nil, Verifier.verifyAsEllipticCurveSignature(proven).bimap(_.err, _ => TRUE))
+
+      case other =>
+        (Nil, s"$other: Unsupported script version".asLeft[EVALUATED])
+    }
+  }
+}

@@ -1,0 +1,83 @@
+package com.aeneas.transaction
+
+import com.google.common.primitives.Bytes
+import com.aeneas.account.{AddressScheme, Alias, KeyPair, PrivateKey, PublicKey}
+import com.aeneas.common.state.ByteStr
+import com.aeneas.crypto
+import com.aeneas.common.utils.EitherExt2
+import com.aeneas.lang.ValidationError
+import com.aeneas.transaction.serialization.impl.CreateAliasTxSerializer
+import com.aeneas.transaction.validation.impl.CreateAliasTxValidator
+import monix.eval.Coeval
+import play.api.libs.json.JsObject
+
+import scala.util.Try
+
+final case class CreateAliasTransaction(
+    version: TxVersion,
+    sender: PublicKey,
+    aliasName: String,
+    fee: TxAmount,
+    timestamp: TxTimestamp,
+    proofs: Proofs,
+    chainId: Byte
+) extends SigProofsSwitch
+    with VersionedTransaction
+    with TxWithFee.InWaves
+    with LegacyPBSwitch.V3 {
+
+  lazy val alias: Alias = Alias.createWithChainId(aliasName, chainId).explicitGet()
+
+  override def builder: TransactionParser          = CreateAliasTransaction
+  override val bodyBytes: Coeval[Array[TxVersion]] = Coeval.evalOnce(CreateAliasTransaction.serializer.bodyBytes(this))
+  override val bytes: Coeval[Array[TxVersion]]     = Coeval.evalOnce(CreateAliasTransaction.serializer.toBytes(this))
+  override val json: Coeval[JsObject]              = Coeval.evalOnce(CreateAliasTransaction.serializer.toJson(this))
+
+  override val id: Coeval[ByteStr] = Coeval.evalOnce {
+    val payload = version match {
+      case TxVersion.V1 | TxVersion.V2 => Bytes.concat(Array(builder.typeId), alias.bytes)
+      case _                           => bodyBytes()
+    }
+    ByteStr(crypto.fastHash(payload))
+  }
+}
+
+object CreateAliasTransaction extends TransactionParser {
+  type TransactionT = CreateAliasTransaction
+
+  val supportedVersions: Set[TxVersion] = Set(1, 2, 3)
+  val typeId: TxType                    = 10: Byte
+
+  implicit val validator = CreateAliasTxValidator
+  val serializer         = CreateAliasTxSerializer
+
+  implicit def sign(tx: CreateAliasTransaction, privateKey: PrivateKey): CreateAliasTransaction =
+    tx.copy(proofs = Proofs(crypto.sign(privateKey, tx.bodyBytes())))
+
+  override def parseBytes(bytes: Array[TxVersion]): Try[CreateAliasTransaction] =
+    serializer.parseBytes(bytes)
+
+  def create(
+      version: TxVersion,
+      sender: PublicKey,
+      aliasName: String,
+      fee: TxAmount,
+      timestamp: TxTimestamp,
+      proofs: Proofs,
+      chainId: Byte = AddressScheme.current.chainId
+  ): Either[ValidationError, TransactionT] =
+    CreateAliasTransaction(version, sender, aliasName, fee, timestamp, proofs, chainId).validatedEither
+
+  def signed(
+      version: TxVersion,
+      sender: PublicKey,
+      alias: String,
+      fee: TxAmount,
+      timestamp: TxTimestamp,
+      signer: PrivateKey
+  ): Either[ValidationError, TransactionT] =
+    create(version, sender, alias, fee, timestamp, Nil).map(_.signWith(signer))
+
+  def selfSigned(version: TxVersion, sender: KeyPair, alias: Alias, fee: TxAmount, timestamp: TxTimestamp): Either[ValidationError, TransactionT] =
+    signed(version, sender.publicKey, alias.name, fee, timestamp, sender.privateKey)
+}
