@@ -111,7 +111,7 @@ class CommonValidationTest extends PropSpec with PropertyChecks with Matchers wi
             2,
             reissuable = false,
             Some(script),
-            Constants.UnitsInWave,
+            Constants.UnitsInAsh,
             ts
           ).signWith(richAcc.privateKey)
         else
@@ -124,11 +124,11 @@ class CommonValidationTest extends PropSpec with PropertyChecks with Matchers wi
             2,
             reissuable = false,
             script = None,
-            Constants.UnitsInWave,
+            Constants.UnitsInAsh,
             ts
           ).signWith(richAcc.privateKey)
 
-      val transferWavesTx = TransferTransaction.selfSigned(1.toByte, richAcc, recipientAcc.toAddress, Waves, 10 * Constants.UnitsInWave, Waves, 1 * Constants.UnitsInWave, ByteStr.empty, ts)
+      val transferWavesTx = TransferTransaction.selfSigned(1.toByte, richAcc, recipientAcc.toAddress, Waves, 10 * Constants.UnitsInAsh, Waves, 1 * Constants.UnitsInAsh, ByteStr.empty, ts)
         .explicitGet()
 
       val transferAssetTx = TransferTransaction
@@ -140,9 +140,9 @@ class CommonValidationTest extends PropSpec with PropertyChecks with Matchers wi
           100,
           Waves,
           if (smartToken) {
-            1 * Constants.UnitsInWave + ScriptExtraFee
+            1 * Constants.UnitsInAsh + ScriptExtraFee
           } else {
-            1 * Constants.UnitsInWave
+            1 * Constants.UnitsInAsh
           }, ByteStr.empty,
           ts
         )
@@ -153,9 +153,9 @@ class CommonValidationTest extends PropSpec with PropertyChecks with Matchers wi
           Seq(
             SponsorFeeTransaction
               .selfSigned(1.toByte, richAcc, IssuedAsset(issueTx.id()), Some(10), if (smartToken) {
-                Constants.UnitsInWave + ScriptExtraFee
+                Constants.UnitsInAsh + ScriptExtraFee
               } else {
-                Constants.UnitsInWave
+                Constants.UnitsInAsh
               }, ts)
               .explicitGet()
           )
@@ -165,7 +165,7 @@ class CommonValidationTest extends PropSpec with PropertyChecks with Matchers wi
         if (smartAccount)
           Seq(
             SetScriptTransaction
-              .selfSigned(1.toByte, recipientAcc, Some(script), 1 * Constants.UnitsInWave, ts)
+              .selfSigned(1.toByte, recipientAcc, Some(script), 1 * Constants.UnitsInAsh, ts)
               .explicitGet()
           )
         else Seq.empty

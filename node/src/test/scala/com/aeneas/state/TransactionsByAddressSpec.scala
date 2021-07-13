@@ -41,9 +41,9 @@ class TransactionsByAddressSpec extends FreeSpec with ScalaCheckDrivenPropertyCh
         GenesisSettings(
           genesisTimestamp,
           genesisTimestamp,
-          Constants.TotalWaves,
+          Constants.TotalAsh,
           None,
-          Seq(GenesisTransactionSettings(sender.toAddress.stringRepr, Constants.TotalWaves)),
+          Seq(GenesisTransactionSettings(sender.toAddress.stringRepr, Constants.TotalAsh)),
           1000,
           1.minute
         )
@@ -52,10 +52,10 @@ class TransactionsByAddressSpec extends FreeSpec with ScalaCheckDrivenPropertyCh
     recipient1    <- accountGen
     recipient2    <- accountGen
     txCount1      <- Gen.choose(10, 50)
-    transactions1 <- Gen.listOfN(txCount1, transferGen(sender, Gen.oneOf(recipient1, recipient2).map(_.toAddress), Constants.TotalWaves / 2 / txCount1))
+    transactions1 <- Gen.listOfN(txCount1, transferGen(sender, Gen.oneOf(recipient1, recipient2).map(_.toAddress), Constants.TotalAsh / 2 / txCount1))
     block1 = mkBlock(sender, genesisBlock.id(), transactions1)
     txCount2      <- Gen.choose(10, 50)
-    transactions2 <- Gen.listOfN(txCount2, transferGen(sender, Gen.oneOf(recipient1, recipient2).map(_.toAddress), Constants.TotalWaves / 2 / txCount2))
+    transactions2 <- Gen.listOfN(txCount2, transferGen(sender, Gen.oneOf(recipient1, recipient2).map(_.toAddress), Constants.TotalAsh / 2 / txCount2))
     block2 = mkBlock(sender, block1.id(), transactions2)
   } yield {
     (sender, recipient1, recipient2, Seq(genesisBlock, block1, block2))

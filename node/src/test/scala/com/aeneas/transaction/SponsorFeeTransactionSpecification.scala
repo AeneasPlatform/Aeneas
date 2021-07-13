@@ -147,7 +147,7 @@ class SponsorFeeTransactionSpecification extends PropSpec with PropertyChecks wi
   private val invalidFee =
     Table(
       "fee",
-      -1 * Constants.UnitsInWave,
+      -1 * Constants.UnitsInAsh,
       0
     )
 

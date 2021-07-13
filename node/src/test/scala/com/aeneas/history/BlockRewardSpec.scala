@@ -34,7 +34,7 @@ class BlockRewardSpec
 
   private val BlockRewardActivationHeight = 5
   private val NGActivationHeight          = 0
-  private val InitialReward               = 6 * Constants.UnitsInWave
+  private val InitialReward               = 6 * Constants.UnitsInAsh
   private val rewardSettings = settings.copy(
     blockchainSettings = DefaultBlockchainSettings.copy(
       functionalitySettings = FunctionalitySettings(
@@ -50,7 +50,7 @@ class BlockRewardSpec
       rewardsSettings = RewardsSettings(
         10,
         InitialReward,
-        1 * Constants.UnitsInWave,
+        1 * Constants.UnitsInAsh,
         4
       )
     )
@@ -59,15 +59,15 @@ class BlockRewardSpec
   private def mkEmptyBlock(ref: ByteStr, signer: KeyPair): Block = TestBlock.create(ntpNow, ref, Seq.empty, signer)
 
   private def mkEmptyBlockIncReward(ref: ByteStr, signer: KeyPair): Block =
-    TestBlock.create(ntpNow, ref, Seq.empty, signer, rewardVote = InitialReward + 1 * Constants.UnitsInWave, version = Block.RewardBlockVersion)
+    TestBlock.create(ntpNow, ref, Seq.empty, signer, rewardVote = InitialReward + 1 * Constants.UnitsInAsh, version = Block.RewardBlockVersion)
 
   private def mkEmptyBlockDecReward(ref: ByteStr, signer: KeyPair): Block =
-    TestBlock.create(ntpNow, ref, Seq.empty, signer, rewardVote = InitialReward - 1 * Constants.UnitsInWave, version = Block.RewardBlockVersion)
+    TestBlock.create(ntpNow, ref, Seq.empty, signer, rewardVote = InitialReward - 1 * Constants.UnitsInAsh, version = Block.RewardBlockVersion)
 
   private def mkEmptyBlockReward(ref: ByteStr, signer: KeyPair, vote: Long): Block =
     TestBlock.create(ntpNow, ref, Seq.empty, signer, rewardVote = vote, version = Block.RewardBlockVersion)
 
-  private val InitialMinerBalance = 10000 * Constants.UnitsInWave
+  private val InitialMinerBalance = 10000 * Constants.UnitsInAsh
   private val OneTotalFee         = 100000
   private val OneCarryFee         = (OneTotalFee * 0.6).toLong
   private val OneFee              = (OneTotalFee * 0.4).toLong
@@ -81,9 +81,9 @@ class BlockRewardSpec
       ntpTime.getTimestamp(),
       Seq(
         GenesisTransaction
-          .create(sourceAddress.toAddress, (Constants.TotalWaves - 60000) * Constants.UnitsInWave, ntpTime.getTimestamp())
+          .create(sourceAddress.toAddress, (Constants.TotalAsh - 60000) * Constants.UnitsInAsh, ntpTime.getTimestamp())
           .explicitGet(),
-        GenesisTransaction.create(issuer.toAddress, 40000 * Constants.UnitsInWave, ntpTime.getTimestamp()).explicitGet(),
+        GenesisTransaction.create(issuer.toAddress, 40000 * Constants.UnitsInAsh, ntpTime.getTimestamp()).explicitGet(),
         GenesisTransaction.create(miner1.toAddress, InitialMinerBalance, ntpTime.getTimestamp()).explicitGet(),
         GenesisTransaction.create(miner2.toAddress, InitialMinerBalance, ntpTime.getTimestamp()).explicitGet()
       )
@@ -94,7 +94,7 @@ class BlockRewardSpec
   private val activationScenario = for {
     (sourceAddress, _, miner, _, genesisBlock) <- genesis
     recipient                                  <- accountGen
-    transfers                                  <- Gen.listOfN(10, transferGeneratorP(ntpNow, sourceAddress, recipient.toAddress, 1000 * Constants.UnitsInWave))
+    transfers                                  <- Gen.listOfN(10, transferGeneratorP(ntpNow, sourceAddress, recipient.toAddress, 1000 * Constants.UnitsInAsh))
     b2              = TestBlock.create(ntpNow, genesisBlock.id(), transfers, miner)
     b3              = mkEmptyBlock(b2.id(), miner)
     b4              = mkEmptyBlock(b3.id(), miner)
@@ -169,7 +169,7 @@ class BlockRewardSpec
         d.blockchainUpdater.blockReward(BlockRewardActivationHeight + 9) shouldBe InitialReward.some
         d.blockchainUpdater.balance(miner.toAddress) shouldBe 10 * InitialReward + InitialMinerBalance + totalFee
 
-        val NextReward = InitialReward + 1 * Constants.UnitsInWave
+        val NextReward = InitialReward + 1 * Constants.UnitsInAsh
 
         d.blockchainUpdater.processBlock(newTermBlock) should beRight
         d.blockchainUpdater.height shouldEqual BlockRewardActivationHeight + 10
@@ -209,7 +209,7 @@ class BlockRewardSpec
         d.blockchainUpdater.blockReward(BlockRewardActivationHeight + 10 + 10 + 10 + 10 - 1) shouldBe InitialReward.some
         d.blockchainUpdater.balance(miner.toAddress) shouldBe 10 * InitialReward + 10 * NextReward + 20 * InitialReward + InitialMinerBalance + totalFee
 
-        val DecreasedReward = InitialReward - 1 * Constants.UnitsInWave
+        val DecreasedReward = InitialReward - 1 * Constants.UnitsInAsh
 
         d.blockchainUpdater.processBlock(b7s.last) should beRight
 
@@ -229,7 +229,7 @@ class BlockRewardSpec
           issuer,
           sourceAddress.toAddress,
           Waves,
-          10 * Constants.UnitsInWave,
+          10 * Constants.UnitsInAsh,
           Waves,
           OneTotalFee,
           ByteStr.empty,
@@ -242,7 +242,7 @@ class BlockRewardSpec
           issuer,
           sourceAddress.toAddress,
           Waves,
-          10 * Constants.UnitsInWave,
+          10 * Constants.UnitsInAsh,
           Waves,
           OneTotalFee,
           ByteStr.empty,
@@ -294,7 +294,7 @@ class BlockRewardSpec
           issuer,
           sourceAddress.toAddress,
           Waves,
-          10 * Constants.UnitsInWave,
+          10 * Constants.UnitsInAsh,
           Waves,
           OneTotalFee,
           ByteStr.empty,
@@ -340,7 +340,7 @@ class BlockRewardSpec
           issuer,
           sourceAddress.toAddress,
           Waves,
-          10 * Constants.UnitsInWave,
+          10 * Constants.UnitsInAsh,
           Waves,
           OneTotalFee,
           ByteStr.empty,
@@ -353,7 +353,7 @@ class BlockRewardSpec
           issuer,
           sourceAddress.toAddress,
           Waves,
-          10 * Constants.UnitsInWave,
+          10 * Constants.UnitsInAsh,
           Waves,
           OneTotalFee,
           ByteStr.empty,
@@ -407,7 +407,7 @@ class BlockRewardSpec
     "when all blocks without fees" in forAll(blockWithoutFeesScenario) {
       case (miner1, miner2, b1s, b2, b3s, b4) =>
         withDomain(rewardSettings) { d =>
-          val initialWavesAmount = BigInt(Constants.TotalWaves) * BigInt(Constants.UnitsInWave)
+          val initialWavesAmount = BigInt(Constants.TotalAsh) * BigInt(Constants.UnitsInAsh)
           val term               = rewardSettings.blockchainSettings.rewardsSettings.term
           val minIncrement       = rewardSettings.blockchainSettings.rewardsSettings.minIncrement
           b1s.foreach(b => d.blockchainUpdater.processBlock(b) should beRight)
@@ -449,7 +449,7 @@ class BlockRewardSpec
           BlockchainFeatures.FeeSponsorship.id -> -10
         )
       ),
-      rewardsSettings = RewardsSettings(12, 6 * Constants.UnitsInWave, 1 * Constants.UnitsInWave, 6)
+      rewardsSettings = RewardsSettings(12, 6 * Constants.UnitsInAsh, 1 * Constants.UnitsInAsh, 6)
     )
   )
 
@@ -489,11 +489,11 @@ class BlockRewardSpec
 
         val route = RewardApiRoute(d.blockchainUpdater)
 
-        d.blockchainUpdater.blockReward(9) shouldBe (6 * Constants.UnitsInWave).some
-        d.blockchainUpdater.blockReward(15) shouldBe (6 * Constants.UnitsInWave).some
+        d.blockchainUpdater.blockReward(9) shouldBe (6 * Constants.UnitsInAsh).some
+        d.blockchainUpdater.blockReward(15) shouldBe (6 * Constants.UnitsInAsh).some
 
         d.blockchainUpdater.processBlock(b4) should beRight
-        d.blockchainUpdater.blockReward(16) shouldBe (7 * Constants.UnitsInWave).some
+        d.blockchainUpdater.blockReward(16) shouldBe (7 * Constants.UnitsInAsh).some
 
         route.getRewards(9).explicitGet().votes.increase shouldBe 0
         route.getRewards(10).explicitGet().votes.increase shouldBe 1
@@ -513,7 +513,7 @@ class BlockRewardSpec
           BlockchainFeatures.FeeSponsorship.id -> -10
         )
       ),
-      rewardsSettings = RewardsSettings(3, 6 * Constants.UnitsInWave, 1 * Constants.UnitsInWave, 2)
+      rewardsSettings = RewardsSettings(3, 6 * Constants.UnitsInAsh, 1 * Constants.UnitsInAsh, 2)
     )
   )
 
@@ -538,7 +538,7 @@ class BlockRewardSpec
 
         d.blockchainUpdater.height shouldBe 7
 
-        d.blockchainUpdater.blockReward(7) shouldBe (7 * Constants.UnitsInWave).some
+        d.blockchainUpdater.blockReward(7) shouldBe (7 * Constants.UnitsInAsh).some
       }
   }
 }

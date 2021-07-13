@@ -273,7 +273,7 @@ abstract class LevelDBWriter private[database] (
 
   override def wavesAmount(height: Int): BigInt = readOnly { db =>
     if (db.has(Keys.wavesAmount(height))) db.get(Keys.wavesAmount(height))
-    else BigInt(Constants.UnitsInWave * Constants.TotalWaves)
+    else BigInt(Constants.UnitsInAsh * Constants.TotalAsh)
   }
 
   override def blockReward(height: Int): Option[Long] =

@@ -99,7 +99,7 @@ class ReissueTransactionDiffTest
       issuer <- accountGen
       block = TestBlock.create(
         ntpNow,
-        Seq(GenesisTransaction.create(issuer.toAddress, Constants.TotalWaves * Constants.UnitsInWave, ntpNow).explicitGet())
+        Seq(GenesisTransaction.create(issuer.toAddress, Constants.TotalAsh * Constants.UnitsInAsh, ntpNow).explicitGet())
       )
     } yield (issuer, block)
 
@@ -139,6 +139,6 @@ object ReissueTransactionDiffTest {
       )
     )
 
-  val BeforeActivationFee: Long = 1 * Constants.UnitsInWave
+  val BeforeActivationFee: Long = 1 * Constants.UnitsInAsh
   val AfterActivationFee: Long  = 100000
 }

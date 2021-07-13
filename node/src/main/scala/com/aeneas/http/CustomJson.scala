@@ -36,7 +36,7 @@ object NumberAsStringSerializer extends JsonSerializer[JsValue] {
     "sponsorBalance",
     "totalAmount",
     "totalFee",
-    "totalWavesAmount",
+    "totalAshAmount",
     "value"
   )
 

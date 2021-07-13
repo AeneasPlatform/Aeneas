@@ -29,7 +29,7 @@ class RewardsTestSuite
 
   "reward changes accordingly node's votes and miner's balance changes by reward amount after block generation" - {
     val initMinerBalance = miner.balanceDetails(miner.address).available
-    val initialAmount = BigInt(Constants.TotalWaves) * BigInt(Constants.UnitsInWave)
+    val initialAmount = BigInt(Constants.TotalAsh) * BigInt(Constants.UnitsInAsh)
 
     "when miner votes for increase" in {
 
@@ -54,7 +54,7 @@ class RewardsTestSuite
       rewardAtActivation.votingThreshold shouldBe votingInterval / 2 + 1
       rewardAtActivation.votes.increase shouldBe 0
       rewardAtActivation.votes.decrease shouldBe 0
-      rewardAtActivation.totalWavesAmount shouldBe initialAmount + initial
+      rewardAtActivation.totalAshAmount shouldBe initialAmount + initial
 
       miner.waitForHeight(activationHeight + 1) // 5
       miner.balanceDetails(miner.address).available shouldBe minerBalanceAtActivationHeight + miner.rewardStatus().currentReward
@@ -70,7 +70,7 @@ class RewardsTestSuite
       rewardAfterFirstVote.votingThreshold shouldBe votingInterval / 2 + 1
       rewardAfterFirstVote.votes.increase shouldBe 1
       rewardAfterFirstVote.votes.decrease shouldBe 0
-      rewardAfterFirstVote.totalWavesAmount shouldBe initialAmount + BigInt(initial) * BigInt(votingStartHeight - activationHeight + 1)
+      rewardAfterFirstVote.totalAshAmount shouldBe initialAmount + BigInt(initial) * BigInt(votingStartHeight - activationHeight + 1)
 
       val termEndHeight = activationHeight + term
       val newReward = initial + minIncrement
@@ -92,7 +92,7 @@ class RewardsTestSuite
       rewardAtTermEnd.votingThreshold shouldBe votingInterval / 2 + 1
       rewardAtTermEnd.votes.increase shouldBe 0
       rewardAtTermEnd.votes.decrease shouldBe 0
-      rewardAtTermEnd.totalWavesAmount shouldBe amountAfterTerm
+      rewardAtTermEnd.totalAshAmount shouldBe amountAfterTerm
       val minerBalanceAtTermEndHeight = miner.balanceDetails(miner.address).available
       minerBalanceAtTermEndHeight shouldBe minerBalanceBeforeTermEnd + miner.rewardStatus().currentReward
 
@@ -112,7 +112,7 @@ class RewardsTestSuite
       rewardSecVoting.votingThreshold shouldBe votingInterval / 2 + 1
       rewardSecVoting.votes.increase shouldBe 3
       rewardSecVoting.votes.decrease shouldBe 0
-      rewardSecVoting.totalWavesAmount shouldBe amountAfterTerm + newReward * BigInt(secondVotingStartHeightPlusTwo - termEndHeight)
+      rewardSecVoting.totalAshAmount shouldBe amountAfterTerm + newReward * BigInt(secondVotingStartHeightPlusTwo - termEndHeight)
     }
     "when miner votes for decrease" in {
       docker.restartNode(dockerNodes().head, configWithDecreasedDesired)
@@ -131,7 +131,7 @@ class RewardsTestSuite
       rewardAtActivation.votingThreshold shouldBe votingInterval / 2 + 1
       rewardAtActivation.votes.increase shouldBe 0
       rewardAtActivation.votes.decrease shouldBe 0
-      rewardAtActivation.totalWavesAmount shouldBe initialAmount + initial
+      rewardAtActivation.totalAshAmount shouldBe initialAmount + initial
 
       val termEndHeight = activationHeight + term
       val newReward = initial - minIncrement
@@ -151,7 +151,7 @@ class RewardsTestSuite
       rewardAtTermEnd.votingThreshold shouldBe votingInterval / 2 + 1
       rewardAtTermEnd.votes.increase shouldBe 0
       rewardAtTermEnd.votes.decrease shouldBe 0
-      rewardAtTermEnd.totalWavesAmount shouldBe amountAfterTerm
+      rewardAtTermEnd.totalAshAmount shouldBe amountAfterTerm
       val minerBalanceAtTermEnd = miner.balanceDetails(miner.address).available
       minerBalanceAtTermEnd shouldBe minerBalanceBeforeTermEnd + miner.rewardStatus().currentReward
 
@@ -170,7 +170,7 @@ class RewardsTestSuite
       rewardSecVoting.votingThreshold shouldBe votingInterval / 2 + 1
       rewardSecVoting.votes.increase shouldBe 0
       rewardSecVoting.votes.decrease shouldBe 3
-      rewardSecVoting.totalWavesAmount shouldBe amountAfterTerm + newReward * BigInt(secondVotingStartHeightPlusTwo - termEndHeight)
+      rewardSecVoting.totalAshAmount shouldBe amountAfterTerm + newReward * BigInt(secondVotingStartHeightPlusTwo - termEndHeight)
     }
   }
 }

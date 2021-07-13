@@ -338,7 +338,7 @@ class BlockV5Test
 
   private def createTx(sender: KeyPair, recipient: AddressOrAlias): Transaction =
     TransferTransaction
-      .selfSigned(TxVersion.V1, sender, recipient, Waves, 10 * Constants.UnitsInWave, Waves, 100000, ByteStr.empty, ntpTime.getTimestamp())
+      .selfSigned(TxVersion.V1, sender, recipient, Waves, 10 * Constants.UnitsInAsh, Waves, 100000, ByteStr.empty, ntpTime.getTimestamp())
       .explicitGet()
 
   private val updaterScenario = for {
@@ -446,8 +446,8 @@ class BlockV5Test
         ref = TestBlock.randomSignature(),
         signer = TestBlock.defaultSigner,
         txs = Seq(
-          GenesisTransaction.create(miner1.toAddress, Constants.TotalWaves / 2 * Constants.UnitsInWave, ntpNow).explicitGet(),
-          GenesisTransaction.create(miner2.toAddress, Constants.TotalWaves / 2 * Constants.UnitsInWave, ntpNow).explicitGet()
+          GenesisTransaction.create(miner1.toAddress, Constants.TotalAsh / 2 * Constants.UnitsInAsh, ntpNow).explicitGet(),
+          GenesisTransaction.create(miner2.toAddress, Constants.TotalAsh / 2 * Constants.UnitsInAsh, ntpNow).explicitGet()
         ),
         version = Block.GenesisBlockVersion
       )

@@ -156,7 +156,7 @@ trait TransactionGenBase /*extends ScriptGen with TypedScriptGen*/ extends NTPTi
       issue = IssueTransaction(TxVersion.V2, sender.publicKey, assetName, description, quantity, decimals, reissuable = true, Some(script1), iFee, timestamp)
         .signWith(sender.privateKey)
       setAssetScript = SetAssetScriptTransaction
-        .selfSigned(1.toByte, sender, IssuedAsset(issue.id()), Some(script2), 1 * Constants.UnitsInWave + ScriptExtraFee, timestamp)
+        .selfSigned(1.toByte, sender, IssuedAsset(issue.id()), Some(script2), 1 * Constants.UnitsInAsh + ScriptExtraFee, timestamp)
         .explicitGet()
     } yield (issue, setAssetScript)
 
@@ -498,7 +498,7 @@ trait TransactionGenBase /*extends ScriptGen with TypedScriptGen*/ extends NTPTi
         fixedDecimals.getOrElse(decimals),
         reissuable = false,
         script = None,
-        1 * Constants.UnitsInWave,
+        1 * Constants.UnitsInAsh,
         timestamp
       ).signWith(sender.privateKey)
     }
@@ -516,7 +516,7 @@ trait TransactionGenBase /*extends ScriptGen with TypedScriptGen*/ extends NTPTi
         decimals,
         reissuable = false,
         script = None,
-        1 * Constants.UnitsInWave,
+        1 * Constants.UnitsInAsh,
         timestamp
       ).signWith(sender.privateKey)
     }
@@ -543,7 +543,7 @@ trait TransactionGenBase /*extends ScriptGen with TypedScriptGen*/ extends NTPTi
       minFee  <- smallFeeGen
       minFee1 <- smallFeeGen
       assetId = IssuedAsset(issue.assetId)
-      fee = (if (reducedFee) 0.001 * Constants.UnitsInWave else 1 * Constants.UnitsInWave.toDouble).toLong
+      fee = (if (reducedFee) 0.001 * Constants.UnitsInAsh else 1 * Constants.UnitsInAsh.toDouble).toLong
     } yield (
       issue,
       SponsorFeeTransaction.selfSigned(1.toByte, sender, assetId, Some(minFee), fee, timestamp).explicitGet(),

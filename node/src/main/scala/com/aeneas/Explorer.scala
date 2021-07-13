@@ -86,7 +86,7 @@ object Explorer extends ScorexLogging {
           }
 
           val actualTotalBalance   = balances.values.sum + reader.carryFee
-          val expectedTotalBalance = Constants.UnitsInWave * Constants.TotalWaves + actualTotalReward
+          val expectedTotalBalance = Constants.UnitsInAsh * Constants.TotalAsh + actualTotalReward
           val byKeyTotalBalance    = reader.wavesAmount(blockchainHeight)
 
           if (actualTotalBalance != expectedTotalBalance || expectedTotalBalance != byKeyTotalBalance)

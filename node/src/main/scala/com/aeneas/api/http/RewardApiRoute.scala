@@ -53,7 +53,7 @@ case class RewardApiRoute(blockchain: Blockchain) extends ApiRoute {
 object RewardApiRoute {
   final case class RewardStatus(
       height: Int,
-      totalWavesAmount: BigInt,
+      totalAshAmount: BigInt,
       currentReward: Long,
       minIncrement: Long,
       term: Int,

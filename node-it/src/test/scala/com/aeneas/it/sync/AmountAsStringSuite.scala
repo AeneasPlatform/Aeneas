@@ -250,10 +250,10 @@ class AmountAsStringSuite extends BaseTransactionSuite {
     val rewardsAsInteger = sender.rewardStatus()
     val rewards          = sender.rewardStatus(amountsAsStrings = true)
     val rewardsByHeight  = sender.rewardStatus(Some(currentHeight), amountsAsStrings = true)
-    rewards.totalWavesAmount shouldBe rewardsAsInteger.totalWavesAmount
+    rewards.totalAshAmount shouldBe rewardsAsInteger.totalAshAmount
     rewards.currentReward shouldBe rewardsAsInteger.currentReward
     rewards.minIncrement shouldBe rewardsAsInteger.minIncrement
-    rewardsByHeight.totalWavesAmount shouldBe rewardsAsInteger.totalWavesAmount
+    rewardsByHeight.totalAshAmount shouldBe rewardsAsInteger.totalAshAmount
     rewardsByHeight.currentReward shouldBe rewardsAsInteger.currentReward
     rewardsByHeight.minIncrement shouldBe rewardsAsInteger.minIncrement
   }

@@ -35,12 +35,12 @@ import org.scalatestplus.scalacheck.{ScalaCheckPropertyChecks => PropertyChecks}
 
 class BalancesV4Test extends PropSpec with PropertyChecks with WithState with TransactionGen with NoShrink {
 
-  val MinFee: Long            = Constants.UnitsInWave / 1000L
+  val MinFee: Long            = Constants.UnitsInAsh / 1000L
   val DataTxFee: Long         = 15000000L
   val InvokeScriptTxFee: Long = 15000000L
   val MassTransferTxFee: Long = 15000000L
-  val SetScriptFee: Long      = Constants.UnitsInWave / 1000L
-  val SetAssetScriptFee: Long = Constants.UnitsInWave
+  val SetScriptFee: Long      = Constants.UnitsInAsh / 1000L
+  val SetAssetScriptFee: Long = Constants.UnitsInAsh
 
   val rideV4Activated: FunctionalitySettings = TestFunctionalitySettings.Enabled.copy(
     preActivatedFeatures = Map(
@@ -63,20 +63,20 @@ class BalancesV4Test extends PropSpec with PropertyChecks with WithState with Tr
     ts     <- positiveIntGen
     genesis = Seq(
       GenesisTransaction.create(master.toAddress, ENOUGH_AMT, ts).explicitGet(),
-      GenesisTransaction.create(acc1.toAddress, 25 * Constants.UnitsInWave + 3 * MinFee, ts).explicitGet(),
+      GenesisTransaction.create(acc1.toAddress, 25 * Constants.UnitsInAsh + 3 * MinFee, ts).explicitGet(),
       GenesisTransaction
-        .create(dapp.toAddress, 10 * Constants.UnitsInWave + SetScriptFee + 2 * InvokeScriptTxFee + 1 * Constants.UnitsInWave, ts)
+        .create(dapp.toAddress, 10 * Constants.UnitsInAsh + SetScriptFee + 2 * InvokeScriptTxFee + 1 * Constants.UnitsInAsh, ts)
         .explicitGet(),
       CreateAliasTransaction.selfSigned(TxVersion.V2, acc1, Alias.create("alias").explicitGet(), MinFee, ts).explicitGet()
     )
     setScript = SetScriptTransaction.selfSigned(1.toByte, dapp, Some(script("alias")), SetScriptFee, ts).explicitGet()
     ci        = InvokeScriptTransaction.selfSigned(1.toByte, master, dapp.toAddress, functionCall, Nil, InvokeScriptTxFee, Waves, ts + 3).explicitGet()
-    lease1    = LeaseTransaction.selfSigned(2.toByte, acc1, dapp.toAddress, 10 * Constants.UnitsInWave, MinFee, ts + 2).explicitGet()
-    lease2    = LeaseTransaction.selfSigned(2.toByte, acc1, dapp.toAddress, 10 * Constants.UnitsInWave, MinFee, ts + 3).explicitGet()
-    leaseD    = LeaseTransaction.selfSigned(2.toByte, dapp, acc1.toAddress, 1 * Constants.UnitsInWave, MinFee, ts + 3).explicitGet()
+    lease1    = LeaseTransaction.selfSigned(2.toByte, acc1, dapp.toAddress, 10 * Constants.UnitsInAsh, MinFee, ts + 2).explicitGet()
+    lease2    = LeaseTransaction.selfSigned(2.toByte, acc1, dapp.toAddress, 10 * Constants.UnitsInAsh, MinFee, ts + 3).explicitGet()
+    leaseD    = LeaseTransaction.selfSigned(2.toByte, dapp, acc1.toAddress, 1 * Constants.UnitsInAsh, MinFee, ts + 3).explicitGet()
     cancel1   = LeaseCancelTransaction.signed(1.toByte, acc1.publicKey, lease1.id(), MinFee, ts + 4, acc1.privateKey).explicitGet()
     t = TransferTransaction
-      .selfSigned(TxVersion.V2, dapp, acc1.toAddress, Waves, 1 * Constants.UnitsInWave + MinFee, Waves, InvokeScriptTxFee, ByteStr.empty, ts + 5)
+      .selfSigned(TxVersion.V2, dapp, acc1.toAddress, Waves, 1 * Constants.UnitsInAsh + MinFee, Waves, InvokeScriptTxFee, ByteStr.empty, ts + 5)
       .explicitGet()
   } yield {
     (genesis ++ Seq(setScript, lease1, lease2), Seq(cancel1, leaseD, t), acc1, dapp, ci)
@@ -126,13 +126,13 @@ class BalancesV4Test extends PropSpec with PropertyChecks with WithState with Tr
             val apiBalance = com.aeneas.api.common.CommonAccountsApi(d, db, s).balanceDetails(acc1.toAddress)
             val data       = d.accountData(dapp.toAddress)
             data.data("available") shouldBe IntegerDataEntry("available", apiBalance.available)
-            apiBalance.available shouldBe 16 * Constants.UnitsInWave
+            apiBalance.available shouldBe 16 * Constants.UnitsInAsh
             data.data("regular") shouldBe IntegerDataEntry("regular", apiBalance.regular)
-            apiBalance.regular shouldBe 26 * Constants.UnitsInWave
+            apiBalance.regular shouldBe 26 * Constants.UnitsInAsh
             data.data("generating") shouldBe IntegerDataEntry("generating", apiBalance.generating)
-            apiBalance.generating shouldBe 5 * Constants.UnitsInWave
+            apiBalance.generating shouldBe 5 * Constants.UnitsInAsh
             data.data("effective") shouldBe IntegerDataEntry("effective", apiBalance.effective)
-            apiBalance.effective shouldBe 17 * Constants.UnitsInWave
+            apiBalance.effective shouldBe 17 * Constants.UnitsInAsh
 
         }
     }

@@ -49,14 +49,14 @@ class LeasingExpirySpec
     lessor         <- accountGen
     aliasRecipient <- accountGen
     ts = ntpTime.getTimestamp()
-    maxFeeAmount <- Gen.choose(100000L, 1 * Constants.UnitsInWave)
+    maxFeeAmount <- Gen.choose(100000L, 1 * Constants.UnitsInAsh)
     transfer     <- transferGeneratorP(ntpTime.getTimestamp(), lessor, aliasRecipient.toAddress, maxFeeAmount)
     alias        <- aliasGen
     createAlias  <- createAliasGen(aliasRecipient, alias, transfer.amount, ntpTime.getTimestamp())
     genesisBlock = TestBlock.create(
       ts,
       Seq(
-        GenesisTransaction.create(lessor.toAddress, Constants.TotalWaves * Constants.UnitsInWave, ntpTime.getTimestamp()).explicitGet(),
+        GenesisTransaction.create(lessor.toAddress, Constants.TotalAsh * Constants.UnitsInAsh, ntpTime.getTimestamp()).explicitGet(),
         transfer,
         createAlias
       )
@@ -66,7 +66,7 @@ class LeasingExpirySpec
 
   private def lease(sender: KeyPair, recipient: AddressOrAlias): Gen[LeaseTransaction] =
     for {
-      amount <- Gen.choose(1 * Constants.UnitsInWave, 1000 * Constants.UnitsInWave)
+      amount <- Gen.choose(1 * Constants.UnitsInAsh, 1000 * Constants.UnitsInAsh)
       fee    <- smallFeeGen
       l      <- createLease(sender, amount, fee, ntpTime.getTimestamp(), recipient)
     } yield l
@@ -184,7 +184,7 @@ class LeasingExpirySpec
   }
 
   "Leasing cancellation" - {
-    val amount     = 1000 * Constants.UnitsInWave
+    val amount     = 1000 * Constants.UnitsInAsh
     val halfAmount = amount / 2
 
     val manyLeases = for {
@@ -228,7 +228,7 @@ class LeasingExpirySpec
   }
 
   "Miner" - {
-    val amount = 1000 * Constants.UnitsInWave
+    val amount = 1000 * Constants.UnitsInAsh
 
     val leaseInTheCancelBlock = for {
       (lessor, _, genesisBlock) <- genesis

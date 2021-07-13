@@ -26,7 +26,7 @@ package object util {
       f.flatMap(v => if (cond(v)) Future.successful(v) else schedule(retryUntil(f, cond, retryInterval), retryInterval))
   }
   implicit class DoubleExt(val d: Double) extends AnyVal {
-    def waves: Long = (BigDecimal(d) * Constants.UnitsInWave).toLong
+    def waves: Long = (BigDecimal(d) * Constants.UnitsInAsh).toLong
   }
   implicit class TypedDataEntry(entry: DataEntry[_]) {
     def as[T]: T = entry.asInstanceOf[T]

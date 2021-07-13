@@ -4520,7 +4520,7 @@
         "minIncrement",
         "nextCheck",
         "term",
-        "totalWavesAmount",
+        "totalAshAmount",
         "votes",
         "votingInterval",
         "votingIntervalStart",
@@ -4531,7 +4531,7 @@
           "type": "integer",
           "format": "int32"
         },
-        "totalWavesAmount": {
+        "totalAshAmount": {
           "type": "integer",
           "format": "int32"
         },
