@@ -10,8 +10,14 @@ import play.api.libs.json.{Format, Json}
 case class RewardApiRoute(blockchain: Blockchain) extends ApiRoute {
   import RewardApiRoute._
 
-  override lazy val route: Route = pathPrefix("blockchain" / "rewards") {
-    rewards() ~ rewardsAtHeight()
+  override lazy val route: Route = pathPrefix("blockchain") {
+    path("rewards") {
+      rewards() ~ rewardsAtHeight()
+    } ~ path("currentReward") {
+      currentReward()
+    } ~ path("circulatingSupplyAsh") {
+      totalAshAmount()
+    }
   }
 
   def rewards(): Route = (get & pathEndOrSingleSlash) {
@@ -20,6 +26,14 @@ case class RewardApiRoute(blockchain: Blockchain) extends ApiRoute {
 
   def rewardsAtHeight(): Route = (get & path(IntNumber)) { height =>
     complete(getRewards(height))
+  }
+
+  def currentReward(): Route = get {
+    complete(getRewards(blockchain.height).map(r => CurrentReward(r.currentReward)))
+  }
+
+  def totalAshAmount(): Route = get {
+    complete(getRewards(blockchain.height).map(r => TotalAsh(r.totalAshAmount)))
   }
 
   def getRewards(height: Int): Either[ValidationError, RewardStatus] =
@@ -65,7 +79,11 @@ object RewardApiRoute {
   )
 
   final case class RewardVotes(increase: Int, decrease: Int)
+  final case class CurrentReward(currentReward: Long)
+  final case class TotalAsh(totalAshAmount: BigInt)
 
   implicit val rewardVotesFormat: Format[RewardVotes] = Json.format
   implicit val rewardFormat: Format[RewardStatus]     = Json.format
+  implicit val currentRewardFormat: Format[CurrentReward] = Json.format
+  implicit val totalAshFormat: Format[TotalAsh] = Json.format
 }

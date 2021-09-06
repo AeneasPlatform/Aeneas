@@ -1635,6 +1635,62 @@
         }
       }
     },
+    "/blockchain/currentReward": {
+      "get": {
+        "tags": [
+          "blockchain"
+        ],
+        "summary": "Current reward amount",
+        "description": "Get current miner’s reward amount",
+        "operationId": "currentReward_1",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "object",
+              "required": [
+                "currentReward"
+              ],
+              "properties": {
+                "currentReward": {
+                  "type": "integer",
+                  "format": "int64"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/blockchain/circulatingSupplyAsh": {
+      "get": {
+        "tags": [
+          "blockchain"
+        ],
+        "summary": "Total Ash amount",
+        "description": "Get total amount of circulating Ash",
+        "operationId": "totalAshAmount_1",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "object",
+              "required": [
+                "totalAshAmount"
+              ],
+              "properties": {
+                "totalAshAmount": {
+                  "type": "integer",
+                  "format": "int64"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/transactions/status": {
       "get": {
         "tags": [
