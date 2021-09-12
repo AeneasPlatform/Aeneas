@@ -1691,6 +1691,34 @@
         }
       }
     },
+    "/blockchain/richList": {
+      "get": {
+        "tags": [
+          "blockchain"
+        ],
+        "summary": "Top 1000 rich list",
+        "description": "List of 1000 richest wallets in desc order",
+        "operationId": "richlist_1",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "object",
+              "description": "map of address <-> balance",
+              "additionalProperties": {
+                "type": "integer",
+                "format": "int64"
+              },
+              "example": {
+                "addr1": 0,
+                "addr2": 100
+              }
+            }
+          }
+        }
+      }
+    },
     "/transactions/status": {
       "get": {
         "tags": [

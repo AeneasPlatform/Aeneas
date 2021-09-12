@@ -1,13 +1,19 @@
 package com.aeneas.api.http
 
 import akka.http.scaladsl.server.Route
+import com.aeneas.account.Address
+import com.aeneas.api.common.CommonAssetsApi
 import com.aeneas.features.BlockchainFeatures
 import com.aeneas.lang.ValidationError
 import com.aeneas.state.Blockchain
+import com.aeneas.transaction.{TxAmount, TxTimestamp}
 import com.aeneas.transaction.TxValidationError.GenericError
+import monix.eval.Task
+import play.api.libs.json.Json.JsValueWrapper
 import play.api.libs.json.{Format, Json}
 
-case class RewardApiRoute(blockchain: Blockchain) extends ApiRoute {
+case class RewardApiRoute(blockchain: Blockchain,
+                          assetsApi: CommonAssetsApi) extends ApiRoute {
   import RewardApiRoute._
 
   override lazy val route: Route = pathPrefix("blockchain") {
@@ -17,6 +23,8 @@ case class RewardApiRoute(blockchain: Blockchain) extends ApiRoute {
       currentReward()
     } ~ path("circulatingSupplyAsh") {
       totalAshAmount()
+    } ~ path("richList") {
+      richList()
     }
   }
 
@@ -62,6 +70,21 @@ case class RewardApiRoute(blockchain: Blockchain) extends ApiRoute {
       votingThreshold,
       RewardVotes(votes.count(_ > reward), votes.count(_ < reward))
     )
+
+  def richList(): Route = get {
+    extractScheduler { implicit s =>
+      complete(
+        addressDistribution(blockchain.height)
+        .map(list => list.sortBy(_._2)(Ordering[TxTimestamp].reverse))
+        .runToFuture
+        .map {l => Json.obj(l.map { case (address, balance) => address.toString -> (balance: JsValueWrapper) }: _*)}
+      )
+    }
+  }
+
+  private def addressDistribution(height: Int):Task[List[(Address, TxAmount)]] = assetsApi
+      .wavesDistribution(height, None)
+      .toListL
 }
 
 object RewardApiRoute {

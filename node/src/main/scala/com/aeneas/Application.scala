@@ -381,7 +381,7 @@ class Application(val actorSystem: ActorSystem, val settings: WavesSettings, con
         ActivationApiRoute(settings.restAPISettings, settings.featuresSettings, blockchainUpdater),
         LeaseApiRoute(settings.restAPISettings, wallet, blockchainUpdater, utxSynchronizer, time, extensionContext.accountsApi),
         AliasApiRoute(settings.restAPISettings, extensionContext.transactionsApi, wallet, utxSynchronizer, time, blockchainUpdater),
-        RewardApiRoute(blockchainUpdater)
+        RewardApiRoute(blockchainUpdater, extensionContext.assetsApi)
       )
 
       val combinedRoute = CompositeHttpService(apiRoutes, settings.restAPISettings)(actorSystem).loggingCompositeRoute

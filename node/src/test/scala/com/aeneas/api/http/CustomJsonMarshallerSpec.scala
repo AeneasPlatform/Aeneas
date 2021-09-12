@@ -88,7 +88,7 @@ class CustomJsonMarshallerSpec
     }
   }
 
-  private val rewardRoute = RewardApiRoute(blockchain).route
+  private val rewardRoute = RewardApiRoute(blockchain, null).route
 
   property("/blockchain/rewards") {
     (() => blockchain.height).expects().returning(1000).anyNumberOfTimes()

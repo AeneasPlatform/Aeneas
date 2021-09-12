@@ -487,7 +487,7 @@ class BlockRewardSpec
         calcSettings.nearestTermEnd(4, 9) shouldBe 15
         calcSettings.nearestTermEnd(4, 10) shouldBe 15
 
-        val route = RewardApiRoute(d.blockchainUpdater)
+        val route = RewardApiRoute(d.blockchainUpdater, null)
 
         d.blockchainUpdater.blockReward(9) shouldBe (6 * Constants.UnitsInAsh).some
         d.blockchainUpdater.blockReward(15) shouldBe (6 * Constants.UnitsInAsh).some
