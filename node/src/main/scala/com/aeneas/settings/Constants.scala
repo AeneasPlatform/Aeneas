@@ -12,6 +12,7 @@ object Constants extends ScorexLogging {
 
   val UnitsInAsh = 100_000_000L
   val TotalAsh  = 86_608_965L
+  val AshPrecision = 8;
 
   lazy val TransactionNames: Map[Byte, String] =
     Map(

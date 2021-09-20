@@ -5,6 +5,7 @@ import com.aeneas.account.Address
 import com.aeneas.api.common.CommonAssetsApi
 import com.aeneas.features.BlockchainFeatures
 import com.aeneas.lang.ValidationError
+import com.aeneas.settings.Constants
 import com.aeneas.state.Blockchain
 import com.aeneas.transaction.{TxAmount, TxTimestamp}
 import com.aeneas.transaction.TxValidationError.GenericError
@@ -41,7 +42,7 @@ case class RewardApiRoute(blockchain: Blockchain,
   }
 
   def totalAshAmount(): Route = get {
-    complete(getRewards(blockchain.height).map(r => TotalAsh(r.totalAshAmount)))
+    complete(getRewards(blockchain.height).map(r => TotalAsh((BigDecimal(r.totalAshAmount) / Constants.UnitsInAsh).setScale(Constants.AshPrecision).toString())))
   }
 
   def getRewards(height: Int): Either[ValidationError, RewardStatus] =
@@ -103,7 +104,7 @@ object RewardApiRoute {
 
   final case class RewardVotes(increase: Int, decrease: Int)
   final case class CurrentReward(currentReward: Long)
-  final case class TotalAsh(totalAshAmount: BigInt)
+  final case class TotalAsh(totalAshAmount: String)
 
   implicit val rewardVotesFormat: Format[RewardVotes] = Json.format
   implicit val rewardFormat: Format[RewardStatus]     = Json.format
