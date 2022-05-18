@@ -7,7 +7,7 @@ import sbtassembly.MergeStrategy
 enablePlugins(RunApplicationSettings, JavaServerAppPackaging, UniversalDeployPlugin, JDebPackaging, SystemdPlugin, GitVersioning, VersionObject)
 
 resolvers ++= Seq(
-  Resolver.bintrayRepo("ethereum", "maven"),
+  "Ethereum LevelDB" at "https://repo.softmotions.com/repository/softmotions-public/",
   Resolver.bintrayRepo("dnvriend", "maven"),
   Resolver.sbtPluginRepo("releases")
 )
