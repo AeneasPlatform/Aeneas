@@ -19,6 +19,7 @@ target
 
 # logs
 *.log
+*.log.gz
 
 # local settings
 localsettings.json
@@ -30,6 +31,9 @@ waves_logback.xml
 *.ods
 *.csv
 *.dat
+
+#local storage files
+.node
 
 # standalone docker
 Dockerfile
